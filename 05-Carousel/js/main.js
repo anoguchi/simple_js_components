@@ -4,9 +4,9 @@ const nextButton = carousel.querySelector(".next-button");
 
 const contents = carousel.querySelector(".carousel__contents");
 
-const dots = Array.from(carousel.querySelectorAll(".carousel__dot"));
+const dots = [...carousel.querySelectorAll(".carousel__dot")];
 
-const slides = Array.from(carousel.querySelectorAll(".carousel__slide"));
+const slides = [...carousel.querySelectorAll(".carousel__slide")];
 
 const dotsContainer = carousel.querySelector(".carousel__dots");
 
@@ -67,40 +67,34 @@ previousButton.addEventListener("click", (event) => {
 
 dotsContainer.addEventListener("click", (event) => {
   const dot = event.target.closest("button");
-  if (dot) {
-    let clickedDotIndex;
+  if (!dot) return;
 
-    for (let index = 0; index < dots.length; index++) {
-      if (dots[index] === dot) {
-        clickedDotIndex = index;
-      }
-    }
+  const clickedDotIndex = dots.findIndex((d) => d === dot);
 
-    const slideToShow = slides[clickedDotIndex];
-    const destination = getComputedStyle(slideToShow).left;
+  const slideToShow = slides[clickedDotIndex];
+  const destination = getComputedStyle(slideToShow).left;
 
-    contents.style.transform = "translateX(-" + destination + ")";
+  contents.style.transform = `translateX(-${destination})`;
 
-    slides.forEach((slide) => {
-      slide.classList.remove("is-selected");
-    });
-    slideToShow.classList.add("is-selected");
+  slides.forEach((slide) => {
+    slide.classList.remove("is-selected");
+  });
+  slideToShow.classList.add("is-selected");
 
-    dots.forEach((d) => {
-      d.classList.remove("is-selected");
-    });
-    dot.classList.add("is-selected");
+  dots.forEach((d) => {
+    d.classList.remove("is-selected");
+  });
+  dot.classList.add("is-selected");
 
-    // Show / hide buttons
-    if (clickedDotIndex === 0) {
-      previousButton.setAttribute("hidden", true);
-      nextButton.removeAttribute("hidden");
-    } else if (clickedDotIndex === dots.length - 1) {
-      previousButton.removeAttribute("hidden");
-      nextButton.setAttribute("hidden", true);
-    } else {
-      previousButton.removeAttribute("hidden");
-      nextButton.removeAttribute("hidden");
-    }
+  // Show / hide buttons
+  if (clickedDotIndex === 0) {
+    previousButton.setAttribute("hidden", true);
+    nextButton.removeAttribute("hidden");
+  } else if (clickedDotIndex === dots.length - 1) {
+    previousButton.removeAttribute("hidden");
+    nextButton.setAttribute("hidden", true);
+  } else {
+    previousButton.removeAttribute("hidden");
+    nextButton.removeAttribute("hidden");
   }
 });
