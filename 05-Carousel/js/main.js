@@ -1,31 +1,39 @@
 const carousel = document.querySelector(".carousel");
 const previousButton = carousel.querySelector(".previous-button");
 const nextButton = carousel.querySelector(".next-button");
-
 const contents = carousel.querySelector(".carousel__contents");
-
 const dots = [...carousel.querySelectorAll(".carousel__dot")];
-
 const slides = [...carousel.querySelectorAll(".carousel__slide")];
-
 const dotsContainer = carousel.querySelector(".carousel__dots");
 
 const slideWidth = slides[0].getBoundingClientRect().width;
 
-slides.forEach((slide, index) => {
-  slide.style.left = slideWidth * index + "px";
-});
+function setSlidePositions() {
+  const slideWidth = slides[0].getBoundingClientRect().width;
+  slides.forEach((slide, index) => {
+    slide.style.left = slideWidth * index + "px";
+  });
+}
 
-console.log(slideWidth);
+function switchSlide(currentSlide, targetSlide) {
+  const destination = getComputedStyle(targetSlide).left;
+  contents.style.transform = `translateX(-${destination})`;
+  currentSlide.classList.remove("is-selected");
+  targetSlide.classList.add("is-selected");
+}
+
+function highlightDot(currentDot, targetDot) {
+  currentDot.classList.remove("is-selected");
+  targetDot.classList.add("is-selected");
+}
+
+setSlidePositions();
 
 nextButton.addEventListener("click", (event) => {
   const currentSlide = contents.querySelector(".is-selected");
   const nextSlide = currentSlide.nextElementSibling;
-  const destination = getComputedStyle(nextSlide).left;
 
-  contents.style.transform = "translateX(-" + destination + ")";
-  currentSlide.classList.remove("is-selected");
-  nextSlide.classList.add("is-selected");
+  switchSlide(currentSlide, nextSlide);
 
   previousButton.removeAttribute("hidden");
 
@@ -37,19 +45,14 @@ nextButton.addEventListener("click", (event) => {
   // Highlight dot
   const currentDot = dotsContainer.querySelector(".is-selected");
   const nextDot = currentDot.nextElementSibling;
-  currentDot.classList.remove("is-selected");
-  nextDot.classList.add("is-selected");
+  highlightDot(currentDot, nextDot);
 });
 
 previousButton.addEventListener("click", (event) => {
   const currentSlide = contents.querySelector(".is-selected");
   const previousSlide = currentSlide.previousElementSibling;
-  const destination = getComputedStyle(previousSlide).left;
-  console.log(destination);
 
-  contents.style.transform = "translateX(-" + destination + ")";
-  currentSlide.classList.remove("is-selected");
-  previousSlide.classList.add("is-selected");
+  switchSlide(currentSlide, previousSlide);
 
   // Shows next button
   nextButton.removeAttribute("hidden");
@@ -61,8 +64,7 @@ previousButton.addEventListener("click", (event) => {
   // Highlight dot
   const currentDot = dotsContainer.querySelector(".is-selected");
   const previousDot = currentDot.previousElementSibling;
-  currentDot.classList.remove("is-selected");
-  previousDot.classList.add("is-selected");
+  highlightDot(currentDot, previousDot);
 });
 
 dotsContainer.addEventListener("click", (event) => {
