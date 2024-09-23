@@ -27,6 +27,19 @@ function highlightDot(currentDot, targetDot) {
   targetDot.classList.add("is-selected");
 }
 
+function showHideArrowButtons(targetSlideIndex) {
+  if (targetSlideIndex === 0) {
+    previousButton.setAttribute("hidden", true);
+    nextButton.removeAttribute("hidden");
+  } else if (targetSlideIndex === dots.length - 1) {
+    previousButton.removeAttribute("hidden");
+    nextButton.setAttribute("hidden", true);
+  } else {
+    previousButton.removeAttribute("hidden");
+    nextButton.removeAttribute("hidden");
+  }
+}
+
 setSlidePositions();
 
 nextButton.addEventListener("click", (event) => {
@@ -37,10 +50,9 @@ nextButton.addEventListener("click", (event) => {
 
   previousButton.removeAttribute("hidden");
 
-  // Hides next button
-  if (!nextSlide.nextElementSibling) {
-    nextButton.setAttribute("hidden", true);
-  }
+  const nextSlideIndex = slides.findIndex((slide) => slide === nextSlide);
+
+  showHideArrowButtons(nextSlideIndex);
 
   // Highlight dot
   const currentDot = dotsContainer.querySelector(".is-selected");
@@ -54,12 +66,11 @@ previousButton.addEventListener("click", (event) => {
 
   switchSlide(currentSlide, previousSlide);
 
-  // Shows next button
-  nextButton.removeAttribute("hidden");
+  const previousSlideIndex = slides.findIndex(
+    (slide) => slide === previousSlide
+  );
 
-  if (!previousSlide.previousElementSibling) {
-    previousButton.setAttribute("hidden", true);
-  }
+  showHideArrowButtons(previousSlideIndex);
 
   // Highlight dot
   const currentDot = dotsContainer.querySelector(".is-selected");
@@ -71,32 +82,12 @@ dotsContainer.addEventListener("click", (event) => {
   const dot = event.target.closest("button");
   if (!dot) return;
 
-  const clickedDotIndex = dots.findIndex((d) => d === dot);
+  const currentSlide = contents.querySelector(".is-selected");
+  const targetSlideIndex = dots.findIndex((d) => d === dot);
+  const currentDot = dotsContainer.querySelector(".is-selected");
+  const slideToShow = slides[targetSlideIndex];
 
-  const slideToShow = slides[clickedDotIndex];
-  const destination = getComputedStyle(slideToShow).left;
-
-  contents.style.transform = `translateX(-${destination})`;
-
-  slides.forEach((slide) => {
-    slide.classList.remove("is-selected");
-  });
-  slideToShow.classList.add("is-selected");
-
-  dots.forEach((d) => {
-    d.classList.remove("is-selected");
-  });
-  dot.classList.add("is-selected");
-
-  // Show / hide buttons
-  if (clickedDotIndex === 0) {
-    previousButton.setAttribute("hidden", true);
-    nextButton.removeAttribute("hidden");
-  } else if (clickedDotIndex === dots.length - 1) {
-    previousButton.removeAttribute("hidden");
-    nextButton.setAttribute("hidden", true);
-  } else {
-    previousButton.removeAttribute("hidden");
-    nextButton.removeAttribute("hidden");
-  }
+  switchSlide(currentSlide, slideToShow);
+  highlightDot(currentDot, dot);
+  showHideArrowButtons(targetSlideIndex);
 });
