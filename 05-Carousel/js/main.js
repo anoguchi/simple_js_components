@@ -8,6 +8,11 @@ const dotsContainer = carousel.querySelector(".carousel__dots");
 
 const slideWidth = slides[0].getBoundingClientRect().width;
 
+function getCurrentSlideIndex() {
+  const currentSlide = contents.querySelector(".is-selected");
+  return slides.findIndex((slide) => slide === currentSlide);
+}
+
 function setSlidePositions() {
   const slideWidth = slides[0].getBoundingClientRect().width;
   slides.forEach((slide, index) => {
@@ -15,14 +20,18 @@ function setSlidePositions() {
   });
 }
 
-function switchSlide(currentSlide, targetSlide) {
+function switchSlide(currentSlideIndex, targetSlideIndex) {
+  const currentSlide = slides[currentSlideIndex];
+  const targetSlide = slides[targetSlideIndex];
   const destination = getComputedStyle(targetSlide).left;
   contents.style.transform = `translateX(-${destination})`;
   currentSlide.classList.remove("is-selected");
   targetSlide.classList.add("is-selected");
 }
 
-function highlightDot(currentDot, targetDot) {
+function highlightDot(currentSlideIndex, targetSlideIndex) {
+  const currentDot = dots[currentSlideIndex];
+  const targetDot = dots[targetSlideIndex];
   currentDot.classList.remove("is-selected");
   targetDot.classList.add("is-selected");
 }
@@ -43,51 +52,31 @@ function showHideArrowButtons(targetSlideIndex) {
 setSlidePositions();
 
 nextButton.addEventListener("click", (event) => {
-  const currentSlide = contents.querySelector(".is-selected");
-  const nextSlide = currentSlide.nextElementSibling;
+  const currentSlideIndex = getCurrentSlideIndex();
+  const nextSlideIndex = currentSlideIndex + 1;
 
-  switchSlide(currentSlide, nextSlide);
-
-  previousButton.removeAttribute("hidden");
-
-  const nextSlideIndex = slides.findIndex((slide) => slide === nextSlide);
-
+  switchSlide(currentSlideIndex, nextSlideIndex);
+  highlightDot(currentSlideIndex, nextSlideIndex);
   showHideArrowButtons(nextSlideIndex);
-
-  // Highlight dot
-  const currentDot = dotsContainer.querySelector(".is-selected");
-  const nextDot = currentDot.nextElementSibling;
-  highlightDot(currentDot, nextDot);
 });
 
 previousButton.addEventListener("click", (event) => {
-  const currentSlide = contents.querySelector(".is-selected");
-  const previousSlide = currentSlide.previousElementSibling;
+  const currentSlideIndex = getCurrentSlideIndex();
+  const previousSlideIndex = currentSlideIndex - 1;
 
-  switchSlide(currentSlide, previousSlide);
-
-  const previousSlideIndex = slides.findIndex(
-    (slide) => slide === previousSlide
-  );
-
+  switchSlide(currentSlideIndex, previousSlideIndex);
+  highlightDot(currentSlideIndex, previousSlideIndex);
   showHideArrowButtons(previousSlideIndex);
-
-  // Highlight dot
-  const currentDot = dotsContainer.querySelector(".is-selected");
-  const previousDot = currentDot.previousElementSibling;
-  highlightDot(currentDot, previousDot);
 });
 
 dotsContainer.addEventListener("click", (event) => {
   const dot = event.target.closest("button");
   if (!dot) return;
 
-  const currentSlide = contents.querySelector(".is-selected");
+  const currentSlideIndex = getCurrentSlideIndex();
   const targetSlideIndex = dots.findIndex((d) => d === dot);
-  const currentDot = dotsContainer.querySelector(".is-selected");
-  const slideToShow = slides[targetSlideIndex];
 
-  switchSlide(currentSlide, slideToShow);
-  highlightDot(currentDot, dot);
+  switchSlide(currentSlideIndex, targetSlideIndex);
+  highlightDot(currentSlideIndex, targetSlideIndex);
   showHideArrowButtons(targetSlideIndex);
 });
