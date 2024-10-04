@@ -2,11 +2,15 @@ const carousel = document.querySelector(".carousel");
 const previousButton = carousel.querySelector(".previous-button");
 const nextButton = carousel.querySelector(".next-button");
 const contents = carousel.querySelector(".carousel__contents");
-const dots = [...carousel.querySelectorAll(".carousel__dot")];
 const slides = [...carousel.querySelectorAll(".carousel__slide")];
-const dotsContainer = carousel.querySelector(".carousel__dots");
 
 const slideWidth = slides[0].getBoundingClientRect().width;
+
+const dotsContainer = createDots(slides);
+const dots = [...dotsContainer.children];
+
+// Adds dots into the DOM
+carousel.appendChild(dotsContainer);
 
 function getCurrentSlideIndex() {
   const currentSlide = contents.querySelector(".is-selected");
@@ -20,10 +24,13 @@ function setSlidePositions() {
   });
 }
 
+setSlidePositions();
+
 function switchSlide(currentSlideIndex, targetSlideIndex) {
   const currentSlide = slides[currentSlideIndex];
   const targetSlide = slides[targetSlideIndex];
   const destination = getComputedStyle(targetSlide).left;
+
   contents.style.transform = `translateX(-${destination})`;
   currentSlide.classList.remove("is-selected");
   targetSlide.classList.add("is-selected");
@@ -49,7 +56,21 @@ function showHideArrowButtons(targetSlideIndex) {
   }
 }
 
-setSlidePositions();
+function createDots(slides) {
+  const dotsContainer = document.createElement("div");
+  dotsContainer.classList.add("carousel__dots");
+  slides.forEach((slide) => {
+    const dot = document.createElement("button");
+    dot.classList.add("carousel__dot");
+
+    if (slide.classList.contains("is-selected")) {
+      dot.classList.add("is-selected");
+    }
+
+    dotsContainer.appendChild(dot);
+  });
+  return dotsContainer;
+}
 
 nextButton.addEventListener("click", (event) => {
   const currentSlideIndex = getCurrentSlideIndex();
