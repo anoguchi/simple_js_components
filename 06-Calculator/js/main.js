@@ -2,6 +2,102 @@ const calculator = document.querySelector(".calculator");
 const calculatorDisplay = calculator.querySelector(".calculator__display");
 const calculatorButtonsDiv = calculator.querySelector(".calculator__keys");
 
+document.addEventListener("DOMContentLoaded", () => {
+  function pressKeys(...keys) {
+    keys.forEach((pressKey) => {
+      calculator.querySelector(`[data-key="${pressKey}"]`).click();
+    });
+  }
+  function getDisplayValue() {
+    return calculator.querySelector(".calculator__display").textContent;
+  }
+  function resetCalculator() {
+    pressKeys("clear");
+    pressKeys("clear");
+
+    console.assert(getDisplayValue() === "0", "Calculator cleared");
+    console.assert(!calculator.dataset.firstValue, "No first value");
+    console.assert(!calculator.dataset.operator, "No operator value");
+  }
+
+  function runTest(test) {
+    pressKeys(...test.keys);
+    console.assert(getDisplayValue() === test.result, test.message);
+    resetCalculator();
+  }
+
+  function testClearKey() {
+    // Before calculation
+    pressKeys("5", "clear");
+    const clearKeyText =
+      calculator.querySelector('[data-key="clear"]').textContent;
+    console.assert(getDisplayValue() === "0", "Clear before calculation");
+    console.assert(clearKeyText === "AC", "Clear once, should show AC");
+    resetCalculator();
+
+    // After calculation
+    pressKeys("5", "times", "9", "equal", "clear");
+    const { firstValue, operator } = calculator.dataset;
+    console.assert(firstValue, "Clear once;  should have first value");
+    console.assert(operator, "Clear once;  should have operator value");
+    resetCalculator();
+  }
+
+  runTest({
+    keys: ["4", "decimal", "5"],
+    result: "4.5",
+    message: "Number Decimal Number",
+  });
+
+  const tests = [
+    {
+      keys: ["2"],
+      result: "2",
+      message: "Number key",
+    },
+    {
+      keys: ["3", "5"],
+      result: "35",
+      message: "Number Number",
+    },
+    {
+      keys: ["4", "decimal"],
+      result: "4.",
+      message: "Number Decimal",
+    },
+    {
+      keys: ["4", "decimal", "5"],
+      result: "4.5",
+      message: "Number Decimal Number",
+    },
+    // Calculations
+    {
+      keys: ["2", "plus", "5", "equal"],
+      result: "7",
+      message: "Addition",
+    },
+    {
+      keys: ["5", "minus", "9", "equal"],
+      result: "-4",
+      message: "Subtraction",
+    },
+    {
+      keys: ["4", "times", "8", "equal"],
+      result: "32",
+      message: "Multiplication",
+    },
+    {
+      keys: ["5", "divide", "1", "0", "equal"],
+      result: "0.5",
+      message: "Division",
+    },
+  ];
+
+  // Runs tests
+  // tests.forEach(runTest);
+  // testClearKey();
+});
+
 calculatorButtonsDiv.addEventListener("click", (event) => {
   const button = event.target;
   // console.log(event.target);
@@ -69,7 +165,7 @@ calculatorButtonsDiv.addEventListener("click", (event) => {
     button.textContent = "AC";
   }
 
-  console.log(calculator.dataset.firstValue);
-  console.log(calculator.dataset.operator);
+  // console.log(calculator.dataset.firstValue);
+  // console.log(calculator.dataset.operator);
   calculator.dataset.previousButtonType = buttonType;
 });
